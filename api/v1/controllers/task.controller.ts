@@ -4,7 +4,7 @@ import paginationHelper from "../../../helpers/pagination"
 import searchHelper from "../../../helpers/search"
 
 // [GET]: /api/v1/tasks
-export const index  = async (req: Request, res: Response) => {
+export const index = async (req: Request, res: Response) => {
   // Find
   interface Find {
     deleted: boolean,
@@ -12,17 +12,17 @@ export const index  = async (req: Request, res: Response) => {
     title?: RegExp,
 
   }
-  const find:Find ={
+  const find: Find = {
     deleted: false
   }
-  if(req.query.status){
+  if (req.query.status) {
     find["status"] = req.query.status.toString()
   }
   // End Find
 
   // Sort
   const sort = {}
-  if(req.query.sortKey && req.query.sortValue){
+  if (req.query.sortKey && req.query.sortValue) {
     const sortKey = req.query.sortKey.toLocaleString()
     sort[sortKey] = req.query.sortValue
   }
@@ -42,47 +42,82 @@ export const index  = async (req: Request, res: Response) => {
   // End Pagination
 
   // Search
-    let objectSearch = searchHelper(req.query)
-    if(req.query.keyword){
-      find.title = objectSearch.regex
-    }
+  let objectSearch = searchHelper(req.query)
+  if (req.query.keyword) {
+    find.title = objectSearch.regex
+  }
   // End Search
-  const tasks = await Task.find(find) 
-  .limit(objectPagination.limitItems)
-  .skip(objectPagination.skip)
+  const tasks = await Task.find(find)
+    .sort(sort)
+    .limit(objectPagination.limitItems)
+    .skip(objectPagination.skip)
   console.log(tasks)
   res.json(tasks)
 }
 
 // [GET]: /api/v1/tasks/detail
-export const detail  = async (req: Request, res: Response) => {
+export const detail = async (req: Request, res: Response) => {
   const id = req.params.id
   const task = await Task.findOne({
     _id: id,
     deleted: false
   })
-  res.json(task)  
+  res.json(task)
 }
 
 // [PATCH]: /api/v1/tasks/change-status/:id
-export const changeStatus = async(req:Request, res: Response)=>{
-  try{
-      const id:string =req.params.id as string
-      const status: string = req.body.status
-      await Task.updateOne({
-        _id: id,
-      },{
-        status: status
-      })
-      res.json({
-        code: 200,
-        message: "Cập nhật trạng thái thành công"
-      })
+export const changeStatus = async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id as string
+    const status: string = req.body.status
+    await Task.updateOne({
+      _id: id,
+    }, {
+      status: status
+    })
+    res.json({
+      code: 200,
+      message: "Cập nhật trạng thái thành công"
+    })
+  }
+  catch (error) {
+    res.json({
+      code: 400,
+      message: "Không tồn tại"
+    })
+  }
+}
+
+// [PATCH]: /api/v1/tasks/change-multi
+export const changeMulti = async (req: Request, res: Response) => {
+  try {
+    const ids: string[] = req.body.ids
+    const key: string = req.body.key
+    const value: string = req.body.value
+    switch (key) {
+      case "status":
+        await Task.updateMany({
+          _id: { $in: ids }
+        }, {
+          status: value
+        })
+        res.json({
+          code: 200,
+          message: "Cập nhật trạng thái thành công"
+        })
+        break
+      default:
+        res.json({
+          code: 400,
+          message: "Không tồn tại"
+        })
+        break
     }
-    catch(error){
-      res.json({
-        code: 400,
-        message: "Không tồn tại"
-      })
-    }
+  }
+  catch (error) {
+    res.json({
+      code: 400,
+      message: "Không tồn tại"
+    })
+  }
 }
