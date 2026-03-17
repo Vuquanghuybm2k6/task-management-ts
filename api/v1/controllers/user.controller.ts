@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import md5 from "md5"
 import User from "../models/user.model"
+
 // [POST]: /api/v1/users/register
 export const register = async (req: Request, res: Response) => {
   try {
@@ -32,3 +33,37 @@ export const register = async (req: Request, res: Response) => {
   }
 }
 
+// [POST]: /api/v1/users/login
+export const login = async (req: Request, res: Response) => {
+  try {
+    const email = req.body.email
+    const password = req.body.password
+    const user = await User.findOne({
+      email: email,
+      deleted: false
+    })
+    if (!user) {
+      return res.json({
+        code: 400,
+        message: "Không tồn tại email này"
+      })
+    } 
+    if(md5(password) !== user.password ){
+      return res.json({
+        code: 400,
+        message: "Sai mật khẩu"
+      })
+    }
+    res.cookie("token", user.token)
+    return res.json({
+      code: 200,
+      message: "Đăng nhập thành công",
+      token: user.token
+    })
+  } catch (error) {
+    return res.json({
+      code: 500,
+      message: "Server error",
+    })
+  }
+}
