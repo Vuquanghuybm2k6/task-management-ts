@@ -140,3 +140,24 @@ export const create = async (req: Request, res: Response)=>{
     })
   }
 }
+
+// [PATCH]: /api/v1/tasks/edit/:id
+export const edit= async (req,res)=>{
+  try{
+   const id:string = req.params.id
+ 
+      await Task.updateOne({
+        _id:id
+      },req.body)
+      res.json({
+      code: 200,
+      message: "Cập nhật thành công"
+    })
+   }
+  catch(error){
+    res.json({
+      code: 400,
+      message: "Cập nhật thất bại"
+    })
+  }
+}
