@@ -14,4 +14,6 @@ router.post("/create", controller.create)
 
 router.patch("/edit/:id", controller.edit)
 
+router.delete("/delete/:id", controller.deleteTask) // đặt là delete thì sẽ bị trùng tên với một hàm
+
 export const taskRoutes: Router = router 
