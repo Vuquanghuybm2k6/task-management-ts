@@ -11,7 +11,7 @@ const port: number | string= process.env.PORT || 3000;
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
-app.use(cors)
+app.use(cors())
 
 database.connect();
 
