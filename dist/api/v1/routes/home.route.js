@@ -33,14 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const task_route_1 = require("./task.route");
-const user_route_1 = require("./user.route");
-const authMiddleware = __importStar(require("../middlewares/auth.middleware"));
-const home_route_1 = require("./home.route");
-const mainV1Routes = (app) => {
-    const version = "/api/v1";
-    app.use(version + "/tasks", authMiddleware.requireAuth, task_route_1.taskRoutes);
-    app.use(version + "/users", user_route_1.userRoutes);
-    app.use(version + "/", home_route_1.homeRoutes);
-};
-exports.default = mainV1Routes;
+exports.homeRoutes = void 0;
+const express_1 = require("express");
+const router = (0, express_1.Router)();
+const controller = __importStar(require("../controllers/home.controller"));
+router.get("/", controller.index);
+exports.homeRoutes = router;

@@ -26,6 +26,7 @@ const requireAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 code: 400,
                 message: "Tài khoản không hợp lệ"
             });
+            return;
         }
         req["user"] = user;
         next();

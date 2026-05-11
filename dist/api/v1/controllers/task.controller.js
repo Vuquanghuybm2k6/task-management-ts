@@ -17,6 +17,7 @@ const task_model_1 = __importDefault(require("../models/task.model"));
 const pagination_1 = __importDefault(require("../../../helpers/pagination"));
 const search_1 = __importDefault(require("../../../helpers/search"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const find = {
         deleted: false
     };
@@ -26,7 +27,8 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sort = {};
     if (req.query.sortKey && req.query.sortValue) {
         const sortKey = req.query.sortKey.toLocaleString();
-        sort[sortKey] = req.query.sortValue;
+        const sortValue = req.query.sortValue === "asc" ? 1 : -1;
+        sort[sortKey] = sortValue;
     }
     let initPagination = {
         currentPage: 1,
@@ -41,7 +43,7 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const tasks = yield task_model_1.default.find(find)
         .sort(sort)
         .limit(objectPagination.limitItems)
-        .skip(objectPagination.skip);
+        .skip((_a = objectPagination.skip) !== null && _a !== void 0 ? _a : 0);
     console.log(tasks);
     res.json(tasks);
 });

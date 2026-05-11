@@ -21,10 +21,11 @@ export const index = async (req: Request, res: Response) => {
   // End Find
 
   // Sort
-  const sort = {}
+  const sort : Record<string, 1 | -1> = {}
   if (req.query.sortKey && req.query.sortValue) {
     const sortKey = req.query.sortKey.toLocaleString()
-    sort[sortKey] = req.query.sortValue
+    const sortValue = req.query.sortValue === "asc" ? 1 : -1
+    sort[sortKey] = sortValue
   }
   // End Sort
 
@@ -32,7 +33,7 @@ export const index = async (req: Request, res: Response) => {
   let initPagination = {
     currentPage: 1,
     limitItems: 2
-  }
+  } 
   const countTasks = await Task.countDocuments(find)
   const objectPagination = paginationHelper(
     initPagination,
@@ -50,7 +51,7 @@ export const index = async (req: Request, res: Response) => {
   const tasks = await Task.find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
-    .skip(objectPagination.skip)
+    .skip(objectPagination.skip??0) 
   console.log(tasks)
   res.json(tasks)
 }
